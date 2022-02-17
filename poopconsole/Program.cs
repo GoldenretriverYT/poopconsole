@@ -18,8 +18,7 @@ namespace poopconsole
         {
             commands.Add(new ChangeDir());
 
-            Console.WriteLine("welcom to poopconsol");
-            Console.WriteLine("i moved you to C: C:");
+            Console.WriteLine("Welcome to PoopConsole");
 
             while (true) {
                 Console.Write(path + " > ");
@@ -94,7 +93,7 @@ namespace poopconsole
                         }
                         else
                         {
-                            Console.WriteLine("file not found dumbass");
+                            Console.WriteLine("Unable to find file");
                         }
                     }
                     else
@@ -111,7 +110,7 @@ namespace poopconsole
 
                         if(!found)
                         {
-                            Console.WriteLine("Invalid command dumbass mf");
+                            Console.WriteLine("Invalid command");
                         }
                     }
                 }

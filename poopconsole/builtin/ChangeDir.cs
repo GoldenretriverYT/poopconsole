@@ -30,7 +30,7 @@ namespace poopconsole.builtin
                 }
                 else
                 {
-                    Console.WriteLine("Invalid directiory dumbass mf");
+                    Console.WriteLine("Unable to find path");
                 }
             }
             else
@@ -41,7 +41,7 @@ namespace poopconsole.builtin
                 }
                 else
                 {
-                    Console.WriteLine("Invalid directory dumbass mf son of a bitch");
+                    Console.WriteLine("Unable to find path");
                 }
             }
         }
