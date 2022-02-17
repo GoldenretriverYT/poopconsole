@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "poopconsole", "poopconsole\poopconsole.csproj", "{FC853C59-6BF7-47F8-9277-5595CAAB9BC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC853C59-6BF7-47F8-9277-5595CAAB9BC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC853C59-6BF7-47F8-9277-5595CAAB9BC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC853C59-6BF7-47F8-9277-5595CAAB9BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC853C59-6BF7-47F8-9277-5595CAAB9BC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D1941E56-8231-4943-8699-E59A84BDE162}
+	EndGlobalSection
+EndGlobal
