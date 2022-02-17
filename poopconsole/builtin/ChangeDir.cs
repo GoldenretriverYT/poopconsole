@@ -13,14 +13,7 @@ namespace poopconsole.builtin
 
         public override void RunCommand(string[] args)
         {
-            string addPath = "";
-
-            foreach (string arg in args)
-            {
-                if (arg == "cd") continue;
-
-                addPath += arg;
-            }
+            string addPath = args[1];
 
             if (addPath.Contains("/") || addPath.Contains("\\"))
             {

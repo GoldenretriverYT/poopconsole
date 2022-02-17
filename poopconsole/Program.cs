@@ -27,7 +27,7 @@ namespace poopconsole
                 Console.Write(path + " > ");
 
                 string input = Console.ReadLine();
-                string[] args = input.Split(' ');
+                string[] args = Parser.GetArgs(input);
 
                 if(args.Length > 0)
                 {
@@ -107,7 +107,14 @@ namespace poopconsole
                             if (cmd.name != args[0].ToLower()) continue;
 
                             found = true;
-                            cmd.RunCommand(args);
+                            try
+                            {
+                                cmd.RunCommand(args);
+                            }catch(Exception ex)
+                            {
+                                Console.WriteLine(cmd.name + " failed: " + ex.Message);
+                            }
+
                             break;
                         }
 

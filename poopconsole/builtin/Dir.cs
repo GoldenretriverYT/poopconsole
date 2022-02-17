@@ -18,7 +18,7 @@ namespace poopconsole.builtin
 
             foreach(string dir in dirs)
             {
-                Console.WriteLine("D | " + Path.GetDirectoryName(dir + "/"));
+                Console.WriteLine("D | " + Path.GetFileName(dir));
             }
 
             foreach(string file in files)
