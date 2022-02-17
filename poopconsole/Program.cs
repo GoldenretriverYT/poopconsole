@@ -16,7 +16,10 @@ namespace poopconsole
 
         static void Main(string[] launchArgs)
         {
-            commands.Add(new ChangeDir());
+            foreach(AbstractCommand cmd in ReflectiveEnumerator.GetClassesOfType<AbstractCommand>())
+            {
+                commands.Add(cmd);
+            }
 
             Console.WriteLine("Welcome to PoopConsole");
 
