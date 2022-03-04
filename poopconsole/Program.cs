@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace poopconsole
@@ -110,7 +111,17 @@ namespace poopconsole
                         found = true;
                         try
                         {
-                            cmd.RunCommand(args);
+                            CancellationTokenSource tokenSource = new CancellationTokenSource();
+                            CancellationToken ct = tokenSource.Token;
+
+                            MemoryStream ms = new MemoryStream();
+                            WrappedStreamWriter sw = new StreamWriter(ms).Wrap();
+                            Task _ = ConsumeReaderCancellable(new StreamReader(ms, true), ct);
+
+                            cmd.RunCommand(args, ref sw);
+                            tokenSource.Cancel();
+
+                            while(_.Status != TaskStatus.RanToCompletion) { }
                         }
                         catch (Exception ex)
                         {
@@ -142,6 +153,28 @@ namespace poopconsole
                 // process character...for example:
                 Console.Write(buffer[0]);
             }
+        }
+
+        static async Task ConsumeReaderCancellable(TextReader reader, CancellationToken ct)
+        {
+            await Task.Run(async () =>
+            {
+                char[] buffer = new char[1];
+
+                while (true)
+                {
+                    while ((await reader.ReadAsync(buffer, 0, 1)) > 0)
+                    {
+                        // process character...for example:
+                        Console.Write(buffer[0]);
+                    }
+
+                    if (ct.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                }
+            });
         }
     }
 }

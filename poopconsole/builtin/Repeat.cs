@@ -11,11 +11,11 @@ namespace poopconsole.builtin
     {
         public override string name { get => "repeat"; }
 
-        public override void RunCommand(string[] args)
+        public override void RunCommand(string[] args, ref WrappedStreamWriter sw)
         {
             if(args.Length < 3)
             {
-                Console.WriteLine("Syntax error");
+                sw.WriteLine("Syntax error");
                 return;
             }
 
@@ -23,7 +23,7 @@ namespace poopconsole.builtin
 
             if(!parseSuccess)
             {
-                Console.WriteLine("Argument times must be a valid 32-bit integer.");
+                sw.WriteLine("Argument times must be a valid 32-bit integer.");
                 return;
             }
 

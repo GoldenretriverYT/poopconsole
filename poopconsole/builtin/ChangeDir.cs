@@ -11,7 +11,7 @@ namespace poopconsole.builtin
     {
         public override string name { get => "cd"; }
 
-        public override void RunCommand(string[] args)
+        public override void RunCommand(string[] args, ref WrappedStreamWriter sw)
         {
             string addPath = args[1];
 
@@ -23,7 +23,7 @@ namespace poopconsole.builtin
                 }
                 else
                 {
-                    Console.WriteLine("Unable to find path");
+                    sw.WriteLine("Unable to find path");
                 }
             }
             else
@@ -34,7 +34,7 @@ namespace poopconsole.builtin
                 }
                 else
                 {
-                    Console.WriteLine("Unable to find path");
+                    sw.WriteLine("Unable to find path");
                 }
             }
         }

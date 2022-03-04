@@ -11,18 +11,18 @@ namespace poopconsole.builtin
     {
         public override string name { get => "mkdir"; }
 
-        public override void RunCommand(string[] args)
+        public override void RunCommand(string[] args, ref WrappedStreamWriter sw)
         {
             string addPath = args[1];
 
             if(Directory.Exists(Path.Combine(Program.path, addPath)))
             {
-                Console.WriteLine("Error: Directory already exists.");
+                sw.WriteLine("Error: Directory already exists.");
                 return;
             }
 
             Directory.CreateDirectory(Path.Combine(Program.path, addPath));
-            Console.WriteLine("Created directory " + addPath);
+            sw.WriteLine("Created directory " + addPath);
         }
     }
 }

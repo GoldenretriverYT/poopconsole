@@ -11,19 +11,19 @@ namespace poopconsole.builtin
     {
         public override string name { get => "dir"; }
 
-        public override void RunCommand(string[] args)
+        public override void RunCommand(string[] args, ref WrappedStreamWriter sw)
         {
             string[] dirs = Directory.GetDirectories(Program.path);
             string[] files = Directory.GetFiles(Program.path);
 
             foreach(string dir in dirs)
             {
-                Console.WriteLine("D | " + Path.GetFileName(dir));
+                sw.WriteLine("D | " + Path.GetFileName(dir));
             }
 
             foreach(string file in files)
             {
-                Console.WriteLine("F | " + Path.GetFileName(file) + " | " + Math.Floor(new FileInfo(file).Length / 102.4d) * 10 + "kb");
+                sw.WriteLine("F | " + Path.GetFileName(file) + " | " + Math.Floor(new FileInfo(file).Length / 102.4d) * 10 + "kb");
             }
         }
     }
