@@ -27,101 +27,102 @@ namespace poopconsole
                 Console.Write(path + " > ");
 
                 string input = Console.ReadLine();
-                string[] args = Parser.GetArgs(input);
+                Run(input);
+            }
+        }
 
-                if(args.Length > 0)
+        public static void Run(string input)
+        {
+            string[] args = Parser.GetArgs(input);
+
+            if (args.Length > 0)
+            {
+                if (args[0].StartsWith("./"))
                 {
-                    if (args[0].StartsWith("./"))
+                    string programName = args[0].Split("./")[1];
+
+                    if (File.Exists(Path.Combine(path, programName)))
                     {
-                        string programName = args[0].Split("./")[1];
+                        string stringArgs = "";
 
-                        if (File.Exists(Path.Combine(path, programName)))
+                        foreach (string arg in args)
                         {
-                            string stringArgs = "";
+                            if (arg == args[0]) continue;
+                            stringArgs += arg + " ";
+                        }
 
-                            foreach(string arg in args)
+                        if (stringArgs.Length > 0)
+                            stringArgs = stringArgs.Substring(0, stringArgs.Length - 1);
+
+                        proc = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
                             {
-                                if (arg == args[0]) continue;
-                                stringArgs += arg + " ";
+                                FileName = Path.Combine(path, programName),
+                                Arguments = "",
+                                UseShellExecute = false,
+                                RedirectStandardOutput = true,
+                                RedirectStandardError = true,
+                                RedirectStandardInput = true,
+                                CreateNoWindow = true
+                            }
+                        };
+
+                        proc.Start();
+
+                        var _ = ConsumeReader(proc.StandardOutput);
+                        var _2 = ConsumeReader(proc.StandardError);
+
+                        while (!proc.HasExited)
+                        {
+                            while (Console.KeyAvailable == false)
+                            {
+                                if (proc.HasExited) goto ProcExit; // bla bla bla bad pratice go cry
                             }
 
-                            if(stringArgs.Length > 0)
-                                stringArgs = stringArgs.Substring(0, stringArgs.Length - 1);
+                            ConsoleKeyInfo cki = Console.ReadKey();
+                            char procIn = cki.KeyChar;
 
-                            proc = new Process
+                            if (cki.Key == ConsoleKey.Enter)
                             {
-                                StartInfo = new ProcessStartInfo
-                                {
-                                    FileName = Path.Combine(path, programName),
-                                    Arguments = "",
-                                    UseShellExecute = false,
-                                    RedirectStandardOutput = true,
-                                    RedirectStandardError = true,
-                                    RedirectStandardInput = true,
-                                    CreateNoWindow = true
-                                }
-                            };
-
-                            proc.Start();
-
-                            /*proc.OutputDataReceived += OnProcessOutputReceived;
-                            proc.ErrorDataReceived += OnProcessOutputReceived;
-
-                            proc.BeginOutputReadLine();
-                            proc.BeginErrorReadLine();*/
-
-                            var _ = ConsumeReader(proc.StandardOutput);
-                            var _2 = ConsumeReader(proc.StandardError);
-
-                            while (!proc.HasExited)
+                                proc.StandardInput.WriteLine();
+                            }
+                            else
                             {
-                                /*while(!proc.StandardOutput.EndOfStream)
-                                    Console.Write((char)proc.StandardOutput.Read());
-
-                                while (!proc.StandardError.EndOfStream)
-                                    Console.Write((char)proc.StandardError.Read());*/
-
-                                ConsoleKeyInfo cki = Console.ReadKey();
-                                char procIn = cki.KeyChar;
-
-                                if (cki.Key == ConsoleKey.Enter)
-                                {
-                                    proc.StandardInput.WriteLine();
-                                }
-                                else
-                                {
-                                    proc.StandardInput.Write(procIn);
-                                }
+                                proc.StandardInput.Write(procIn);
                             }
                         }
-                        else
-                        {
-                            Console.WriteLine("Unable to find file");
-                        }
+
+                        ProcExit: ;
                     }
                     else
                     {
-                        bool found = false;
-                        foreach(AbstractCommand cmd in commands)
+                        Console.WriteLine("Unable to find file");
+                    }
+                }
+                else
+                {
+                    bool found = false;
+                    foreach (AbstractCommand cmd in commands)
+                    {
+                        if (cmd.name != args[0].ToLower()) continue;
+
+                        found = true;
+                        try
                         {
-                            if (cmd.name != args[0].ToLower()) continue;
-
-                            found = true;
-                            try
-                            {
-                                cmd.RunCommand(args);
-                            }catch(Exception ex)
-                            {
-                                Console.WriteLine(cmd.name + " failed: " + ex.Message);
-                            }
-
-                            break;
+                            cmd.RunCommand(args);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(cmd.name + " failed: " + ex.Message);
                         }
 
-                        if(!found)
-                        {
-                            Console.WriteLine("Invalid command");
-                        }
+                        break;
+                    }
+
+                    if (!found)
+                    {
+                        Console.WriteLine("Invalid command");
                     }
                 }
             }
