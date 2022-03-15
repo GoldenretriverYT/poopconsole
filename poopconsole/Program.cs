@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,9 +16,31 @@ namespace poopconsole
         public static List<AbstractCommand> commands = new();
 
         public static Process proc;
+        public static Thread commandThread;
+
+        public static Dictionary<string, string> vars = new Dictionary<string, string>()
+        {
+            { "KILL_COMMAND_THREAD_ALLOWED", "false" }
+        };
 
         static void Main(string[] launchArgs)
         {
+            Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
+                e.Cancel = true;
+
+                try
+                {
+                    if (proc != null) proc.Kill();
+                    if (commandThread != null) {
+                        if (vars["KILL_COMMAND_THREAD_ALLOWED"].ToLower() == "true") commandThread.Interrupt();
+                        if (vars["KILL_COMMAND_THREAD_ALLOWED"].ToLower() != "true") Console.WriteLine("Killing a command is currently disabled per default due to being extremly experimental and not working properly. Additionally, doing this will not free up CPU time. I don't know if I will ever fix it lol. Use 'setvar KILL_COMMAND_THREAD_ALLOWED true' to enable this experimental feature.");
+                    }
+                }catch(Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            };
+
             foreach (AbstractCommand cmd in ReflectiveEnumerator.GetClassesOfType<AbstractCommand>())
             {
                 commands.Add(cmd);
@@ -33,9 +56,18 @@ namespace poopconsole
             }
         }
 
-        public static void Run(string input)
+        public static void Run(string input, bool subCommand = false)
         {
-            string[] args = Parser.GetArgs(input);
+            string[] args = null;
+
+            try
+            {
+                 args = Parser.GetArgs(input);
+            }catch(Exception ex)
+            {
+                Console.WriteLine("Something went wrong: " + ex.Message);
+                return;
+            }
 
             if (args.Length > 0)
             {
@@ -119,7 +151,27 @@ namespace poopconsole
                             WrappedStreamWriter sw = new StreamWriter(ms).Wrap();
                             Task _ = ConsumeReaderCancellable(new StreamReader(ms, true), ct);
 
-                            cmd.RunCommand(args, ref sw);
+
+                            Thread runningCommandThread = new Thread(() =>
+                            {
+                                try
+                                {
+                                    cmd.RunCommand(args, ref sw);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(cmd.name + " failed: " + ex.Message);
+                                }
+                            });
+
+                            if (!subCommand)
+                            {
+                                commandThread = runningCommandThread;
+                            }
+
+                            runningCommandThread.Start();
+                            runningCommandThread.Join();
+                            
                             tokenSource.Cancel();
 
                             while(_.Status != TaskStatus.RanToCompletion) { }

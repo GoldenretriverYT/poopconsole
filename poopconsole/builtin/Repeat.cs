@@ -34,7 +34,7 @@ namespace poopconsole.builtin
 
                 foreach(string cmd in commands)
                 {
-                    Program.Run(cmd);
+                    Program.Run(cmd, true);
                 }
             }
         }

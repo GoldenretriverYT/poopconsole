@@ -10,6 +10,8 @@ namespace poopconsole
     {
         public static string[] GetArgs(string input)
         {
+            if(input == null) return new string[0];
+
             string[] args = new string[] { };
 
             string currentString = "";
