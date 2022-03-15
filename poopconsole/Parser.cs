@@ -15,29 +15,52 @@ namespace poopconsole
             string[] args = new string[] { };
 
             string currentString = "";
-            bool stringing = false;
+            string currently = "nothing";
 
             char previousChar = ' ';
 
             foreach(char c in input)
             {
-                if(c == ' ' && !stringing)
+                if(c == ' ' && currently == "nothing")
                 {
                     args = args.Append(currentString).ToArray();
                     currentString = "";
-                }else if(c == '"' && previousChar != '\\')
+                }
+                else if (c == '"' && previousChar != '\\')
                 {
-                    if(stringing)
+                    if (currently == "reading string")
                     {
-                        stringing = false;
+                        currently = "nothing";
                         args = args.Append(currentString).ToArray();
+                        currentString = "";
+                    }
+                    else if(currently == "nothing")
+                    {
+                        currently = "reading string";
                         currentString = "";
                     }else
                     {
-                        stringing = true;
+                        currentString += c;
+                    }
+                }
+                else if (c == '%' && previousChar != '\\')
+                {
+                    if (currently == "reading var")
+                    {
+                        currently = "nothing";
+                        args = args.Append(Program.vars[currentString]).ToArray();
                         currentString = "";
                     }
-                }else
+                    else if(currently == "nothing")
+                    {
+                        currently = "reading var";
+                        currentString = "";
+                    }else
+                    {
+                        currentString += c;
+                    }
+                }
+                else
                 {
                     currentString += c;
                 }

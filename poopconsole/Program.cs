@@ -1,6 +1,7 @@
 ﻿using poopconsole.builtin;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -60,6 +61,9 @@ namespace poopconsole
         {
             string[] args = null;
 
+            OutputType ot = OutputType.CONSOLE;
+            string outputInfo = "";
+
             try
             {
                  args = Parser.GetArgs(input);
@@ -67,6 +71,22 @@ namespace poopconsole
             {
                 Console.WriteLine("Something went wrong: " + ex.Message);
                 return;
+            }
+
+            if (args.Length > 2)
+            {
+                if (args[args.Length - 2] == "|f>")
+                {
+                    ot = OutputType.FILE;
+                    outputInfo = args[args.Length - 1];
+                    args = args.Take(args.Length - 2).ToArray();
+                }
+                else if (args[args.Length - 2] == "|v>")
+                {
+                    ot = OutputType.VARIABLE;
+                    outputInfo = args[args.Length - 1];
+                    args = args.Take(args.Length - 2).ToArray();
+                }
             }
 
             if (args.Length > 0)
@@ -93,7 +113,7 @@ namespace poopconsole
                             StartInfo = new ProcessStartInfo
                             {
                                 FileName = Path.Combine(path, programName),
-                                Arguments = "",
+                                Arguments = stringArgs,
                                 UseShellExecute = false,
                                 RedirectStandardOutput = true,
                                 RedirectStandardError = true,
@@ -149,7 +169,7 @@ namespace poopconsole
 
                             MemoryStream ms = new MemoryStream();
                             WrappedStreamWriter sw = new StreamWriter(ms).Wrap();
-                            Task _ = ConsumeReaderCancellable(new StreamReader(ms, true), ct);
+                            Task _ = ConsumeReaderCancellable(new StreamReader(ms, true), ct, ot, outputInfo);
 
 
                             Thread runningCommandThread = new Thread(() =>
@@ -208,8 +228,10 @@ namespace poopconsole
             }
         }
 
-        static async Task ConsumeReaderCancellable(TextReader reader, CancellationToken ct)
+        static async Task ConsumeReaderCancellable(TextReader reader, CancellationToken ct, OutputType ot, string outputInfo)
         {
+            string fullOutput = "";
+
             await Task.Run(async () =>
             {
                 char[] buffer = new char[1];
@@ -219,13 +241,34 @@ namespace poopconsole
                     while ((await reader.ReadAsync(buffer, 0, 1)) > 0)
                     {
                         // process character...for example:
-                        Console.Write(buffer[0]);
+                        switch (ot)
+                        {
+                            case OutputType.CONSOLE:
+                                Console.Write(buffer[0]);
+                                break;
+                            case OutputType.FILE:
+                                File.AppendAllText(outputInfo, buffer[0].ToString());
+                                break;
+                            case OutputType.VARIABLE:
+                                fullOutput += buffer[0].ToString();
+                                break;
+                        }
                     }
 
                     if (ct.IsCancellationRequested)
                     {
+                        if(ot == OutputType.VARIABLE)
+                        {
+                            vars[outputInfo] = fullOutput.Trim();
+                        }
+
                         break;
                     }
+                }
+
+                if (ot == OutputType.VARIABLE)
+                {
+                    vars[outputInfo] = fullOutput.Trim();
                 }
             });
         }

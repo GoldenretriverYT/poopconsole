@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace poopconsole.builtin
 {
-    public class Echo : AbstractCommand
+    public class Cls : AbstractCommand
     {
-        public override string name { get => "echo"; }
+        public override string name { get => "cls"; }
 
         public override void RunCommand(string[] args, ref WrappedStreamWriter sw)
         {
-            if(args.Length > 1)
-                sw.WriteLine(args.Skip(1).ToArray().Join(" ").Trim());
+            Console.Clear();
         }
     }
 }
