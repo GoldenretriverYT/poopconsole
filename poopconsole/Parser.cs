@@ -48,7 +48,15 @@ namespace poopconsole
                     if (currently == "reading var")
                     {
                         currently = "nothing";
-                        args = args.Append(Program.vars[currentString]).ToArray();
+
+                        if(Program.vars.ContainsKey(currentString))
+                        {
+                            args = args.Append(Program.vars[currentString]).ToArray();
+                        }else
+                        {
+                            throw new Exception("The variable " + currentString + " is not defined.");
+                        }
+                        
                         currentString = "";
                     }
                     else if(currently == "nothing")
