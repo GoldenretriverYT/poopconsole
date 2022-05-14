@@ -33,8 +33,10 @@ namespace poopconsole
                 {
                     if (proc != null) proc.Kill();
                     if (commandThread != null) {
-                        if (vars["KILL_COMMAND_THREAD_ALLOWED"].ToLower() == "true") commandThread.Interrupt();
-                        if (vars["KILL_COMMAND_THREAD_ALLOWED"].ToLower() != "true") Console.WriteLine("Killing a command is currently disabled per default due to being extremly experimental and not working properly. Additionally, doing this will not free up CPU time. I don't know if I will ever fix it lol. Use 'setvar KILL_COMMAND_THREAD_ALLOWED true' to enable this experimental feature.");
+                        if (vars["KILL_COMMAND_THREAD_ALLOWED"].ToLower() != "true")
+                            Console.WriteLine("Killing a command is currently disabled per default due to being extremly experimental and not working properly. Additionally, doing this will not free up CPU time. I don't know if I will ever fix it lol. Use 'setvar KILL_COMMAND_THREAD_ALLOWED true' to enable this experimental feature.");
+                        else
+                            commandThread.Interrupt();
                     }
                 }catch(Exception ex)
                 {
