@@ -15,28 +15,28 @@ namespace poopconsole
             string[] args = new string[] { };
 
             string currentString = "";
-            string currently = "nothing";
+            ParserTask currently = ParserTask.Nothing;
 
             char previousChar = ' ';
 
             foreach(char c in input)
             {
-                if(c == ' ' && currently == "nothing")
+                if(c == ' ' && currently == ParserTask.Nothing)
                 {
                     args = args.Append(currentString).ToArray();
                     currentString = "";
                 }
                 else if (c == '"' && previousChar != '\\')
                 {
-                    if (currently == "reading string")
+                    if (currently == ParserTask.ReadingString)
                     {
-                        currently = "nothing";
+                        currently = ParserTask.Nothing;
                         args = args.Append(currentString).ToArray();
                         currentString = "";
                     }
-                    else if(currently == "nothing")
+                    else if(currently == ParserTask.Nothing)
                     {
-                        currently = "reading string";
+                        currently = ParserTask.ReadingString;
                         currentString = "";
                     }else
                     {
@@ -45,9 +45,9 @@ namespace poopconsole
                 }
                 else if (c == '%' && previousChar != '\\')
                 {
-                    if (currently == "reading var")
+                    if (currently == ParserTask.ReadingVariable)
                     {
-                        currently = "nothing";
+                        currently = ParserTask.Nothing;
 
                         if(Program.vars.ContainsKey(currentString))
                         {
@@ -59,9 +59,9 @@ namespace poopconsole
                         
                         currentString = "";
                     }
-                    else if(currently == "nothing")
+                    else if(currently == ParserTask.Nothing)
                     {
-                        currently = "reading var";
+                        currently = ParserTask.ReadingVariable;
                         currentString = "";
                     }else
                     {
@@ -78,5 +78,11 @@ namespace poopconsole
 
             return args;
         }
+    }
+
+    public enum ParserTask {
+        Nothing,
+        ReadingString,
+        ReadingVariable
     }
 }
